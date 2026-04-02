@@ -5,6 +5,7 @@ import com.year2.queryme.model.User;
 import com.year2.queryme.repository.TeacherRepository;
 import com.year2.queryme.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +20,15 @@ public class TeacherService {
     @Autowired
     private TeacherRepository teacherRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
     public Teacher registerTeacher(String email, String password, String fullName) {
-        // 1. Create User
+        // 1. Create User with BCrypt-encoded password
         User user = User.builder()
                 .email(email)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .role("TEACHER")
                 .build();
         userRepository.save(user);
@@ -41,7 +45,7 @@ public class TeacherService {
     @Transactional
     public Teacher updateProfile(Long teacherId, Map<String, String> data) {
         Teacher teacher = teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+                .orElseThrow(() -> new RuntimeException("Teacher not found with id: " + teacherId));
 
         if (data.containsKey("fullName")) {
             teacher.setFullName(data.get("fullName"));

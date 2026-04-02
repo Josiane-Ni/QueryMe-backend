@@ -5,6 +5,7 @@ import com.year2.queryme.model.User;
 import com.year2.queryme.repository.GuestRepository;
 import com.year2.queryme.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +20,15 @@ public class GuestService {
     @Autowired
     private GuestRepository guestRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
     public Guest registerGuest(String email, String password, String fullName) {
         // 1. Create User
         User user = User.builder()
                 .email(email)
-                .password(password)
+                .password(passwordEncoder.encode(password))
                 .role("GUEST")
                 .build();
         userRepository.save(user);
