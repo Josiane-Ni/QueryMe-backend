@@ -1,6 +1,7 @@
 package com.year2.queryme.service;
 
 import com.year2.queryme.model.enums.UserTypes;
+import com.year2.queryme.model.dto.InitializeSuperAdminRequest;
 import com.year2.queryme.model.dto.JwtResponse;
 import com.year2.queryme.model.dto.LoginRequest;
 import com.year2.queryme.model.dto.MessageResponse;
@@ -9,6 +10,7 @@ import com.year2.queryme.repository.UserRepository;
 import com.year2.queryme.security.JwtUtils;
 import com.year2.queryme.security.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +35,9 @@ public class AuthService {
 
     @Autowired
     StudentService studentService;
+
+    @Autowired
+    AdminService adminService;
 
     public ResponseEntity<?> authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -76,5 +81,15 @@ public class AuthService {
         );
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    public ResponseEntity<?> initializeFirstSuperAdmin(InitializeSuperAdminRequest request) {
+        adminService.initializeFirstSuperAdmin(
+                request.getEmail(),
+                request.getPassword(),
+                request.getFullName());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new MessageResponse("Super admin initialized successfully!"));
     }
 }

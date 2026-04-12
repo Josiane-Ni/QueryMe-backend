@@ -71,12 +71,13 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         // ── Public endpoints ─────────────────────────────
                         .requestMatchers("/error").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/signin").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/signup").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/signin").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/signup").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/bootstrap/super-admin").permitAll()
                         .requestMatchers(HttpMethod.GET, "/courses").permitAll()
                         .requestMatchers(HttpMethod.GET, "/class-groups/**").permitAll()
 

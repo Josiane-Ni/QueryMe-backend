@@ -68,6 +68,7 @@ These backend changes now match the intended QueryMe flow more closely:
 - students only see published exams assigned to them by course or enrollment
 - student-facing exam responses no longer expose `seedSql`
 - student-facing question responses no longer expose `referenceQuery`
+- the first super admin can be bootstrapped once through a public auth endpoint
 - question create and update both regenerate the answer key immediately
 - sessions now enforce `maxAttempts`
 - starting a session provisions the sandbox automatically
@@ -99,9 +100,11 @@ These backend changes now match the intended QueryMe flow more closely:
 - Public endpoints in the current config are:
   - `POST /auth/signin`
   - `POST /auth/signup`
+  - `POST /auth/bootstrap/super-admin`
   - `GET /courses`
   - `GET /class-groups/**`
 - Public signup only supports student registration; elevated roles are not public-signup capable.
+- Super admin bootstrap is only allowed while no `Admin` record is flagged as `superAdmin`.
 - Teacher/admin writes are enforced for exam mutation and course enrollment endpoints.
 - Students can start and submit their own sessions, but exam-wide session listings are teacher/admin only.
 - Manual sandbox endpoints are teacher/admin only.
@@ -120,11 +123,13 @@ Base path: `/auth`
 |---|---|---|---|
 | `POST` | `/auth/signup` | Registers a student user with shared auth credentials. Accepts student fields; non-student roles are rejected. | Public |
 | `POST` | `/auth/signin` | Authenticates a user and returns the JWT payload. | Public |
+| `POST` | `/auth/bootstrap/super-admin` | Creates the first super admin account if none exists yet. Returns an error once a super admin has already been initialized. | Public |
 
 Notes:
 
 - Signup creates credentials in the shared `users` auth table.
 - Public signup creates `STUDENT` accounts only.
+- Super admin bootstrap creates an `ADMIN` user plus an `Admin` profile with `superAdmin = true`.
 - Teacher/admin/guest accounts are restricted to admin-managed registration endpoints.
 
 ## Group F - User and Student Management
@@ -162,7 +167,7 @@ These endpoints own profile records, course structure, and teacher-driven studen
 
 | Method | Path | What it does | Access |
 |---|---|---|---|
-| `POST` | `/admins/register` | Creates an admin profile. | `ADMIN` |
+| `POST` | `/admins/register` | Creates a regular admin profile. | `ADMIN` |
 | `PUT` | `/admins/{id}` | Updates an admin profile. | `ADMIN` |
 | `GET` | `/admins` | Lists admins. | `ADMIN` |
 | `POST` | `/guests/register` | Creates a guest profile. | `ADMIN` |
@@ -173,6 +178,7 @@ Notes:
 
 - Course assignment now matters to the exam flow: student exam visibility is filtered by direct course linkage and course enrollments.
 - Credentials live in the shared auth model; the profile modules own the rest of the identity data.
+- The first super admin is created through `/auth/bootstrap/super-admin`; later `/admins/register` calls create non-super-admin accounts.
 
 ## Group A - Exam Module
 

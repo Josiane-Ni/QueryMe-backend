@@ -1,5 +1,6 @@
 package com.year2.queryme.controller;
 
+import com.year2.queryme.model.dto.InitializeSuperAdminRequest;
 import com.year2.queryme.model.dto.LoginRequest;
 import com.year2.queryme.model.dto.SignupRequest;
 import com.year2.queryme.service.AuthService;
@@ -23,5 +24,11 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         return authService.registerUser(signUpRequest);
+    }
+
+    @PostMapping("/bootstrap/super-admin")
+    public ResponseEntity<?> initializeFirstSuperAdmin(
+            @Valid @RequestBody InitializeSuperAdminRequest request) {
+        return authService.initializeFirstSuperAdmin(request);
     }
 }
